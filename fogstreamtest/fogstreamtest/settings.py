@@ -121,3 +121,11 @@ USE_TZ = True
 STATIC_URL = '/assets/'
 
 LOGIN_URL = '/login'
+
+DOMAIN_NAME = 'http://localhost:8000'
+
+EMAIL_HOST = 'smtp.yandex.ru'
+EMAIL_PORT = '465'
+EMAIL_HOST_USER = ''
+EMAIL_HOST_PASSWORD = ''
+EMAIL_USE_SSL = True
