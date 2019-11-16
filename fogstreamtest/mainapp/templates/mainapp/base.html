@@ -1,3 +1,4 @@
+{% load static %}
 <!doctype html>
 <html lang="en">
 <head>
@@ -6,8 +7,26 @@
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>{% block title %}Тест на должность стажера Python/Django{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 <body>
+<ul>
+    {% if user.is_authenticated %}
+    <li>
+        <a href="{% url 'mainapp:send_message' %}">Отправить сообщение</a>
+    </li>
+    <li>
+        <a href="{% url 'mainapp:logout' %}">Выйти</a>
+    </li>
+    {% else %}
+    <li>
+        <a href="{% url 'mainapp:login' %}">Войти</a>
+    </li>
+    <li>
+        <a href="{% url 'mainapp:register_user' %}">Регистрация</a>
+    </li>
+    {% endif %}
+</ul>
 {% block content %}
 {% endblock %}
 </body>

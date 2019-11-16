@@ -15,16 +15,11 @@ from django.contrib.auth.decorators import user_passes_test
 
 from django.http import JsonResponse
 
-from django.core.mail import send_mail
-
-from django.views.generic.edit import CreateView
+from django.views.generic.edit import CreateView, FormView
 
 from django.utils.decorators import method_decorator
 
 from django.conf import settings
-
-import urllib.request
-import json
 
 
 class AjaxableResponseMixin:
@@ -41,9 +36,6 @@ class AjaxableResponseMixin:
             return response
 
     def form_valid(self, form):
-        # We make sure to call the parent's form_valid() method because
-        # it might do some processing (in the case of CreateView, it will
-        # call form.save() for example).
         response = super().form_valid(form)
         if self.request.is_ajax():
             data = {
@@ -60,27 +52,22 @@ class UserCreateView(AjaxableResponseMixin, CreateView):
     form_class = UserRegisterForm
 
 
-def user_login(request):
-    if request.method == 'POST':
-        form = AuthenticationForm(data=request.POST)
-        if form.is_valid():
-            username = request.POST['username']
-            password = request.POST['password']
-            user = authenticate(username=username, password=password)
-            if user:
-                login(request, user)
-                return HttpResponseRedirect(reverse('mainapp:send_message'))
-    else:
-        form = AuthenticationForm()
+class UserSignIn(AjaxableResponseMixin, FormView):
+    form_class = AuthenticationForm
+    template_name = 'mainapp/login.html'
 
-    context = {
-        'form': form,
-    }
-    return render(request, 'mainapp/login.html', context)
+    def form_valid(self, form):
+        user = authenticate(**form.cleaned_data)
+        if user:
+            login(self.request, user)
+        return HttpResponseRedirect('/')
 
 
 def index(request):
-    return HttpResponseRedirect(reverse('mainapp:login'))
+    if request.user.is_authenticated:
+        return HttpResponseRedirect(reverse('mainapp:send_message'))
+    else:
+        return HttpResponseRedirect(reverse('mainapp:login'))
 
 
 @method_decorator(user_passes_test(lambda u: u.is_authenticated), name='dispatch')
@@ -90,12 +77,7 @@ class MessageCreateView(CreateView):
     success_url = reverse_lazy('mainapp:send_message')
     template_name = 'mainapp/message.html'
 
-    def form_valid(self, form):
-        response = super().form_valid(form)
-        users_json = urllib.request.urlopen('http://jsonplaceholder.typicode.com/users')
-        users = json.load(users_json)
-        email = form.cleaned_data['email']
-        message = form.cleaned_data['message']
-        title = 'Сообщение'
-        send_mail(title, message, settings.EMAIL_HOST_USER, [email], fail_silently=False)
-        return response
+
+def user_logout(request):
+    logout(request)
+    return HttpResponseRedirect(reverse('mainapp:index'))
