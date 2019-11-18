@@ -3,8 +3,6 @@ from django.db.models import signals
 import urllib.request
 import json
 
-from mainapp.tasks import send_message
-
 
 def find_email(email):
     """
@@ -37,6 +35,8 @@ class Message(models.Model):
         verbose_name_plural = 'Сообщения'
 
 
+from mainapp.tasks import send_message
+
 def message_post_save(sender, instance, signal, *args, **kwargs):
     email = instance.email
     message = instance.message
@@ -44,8 +44,6 @@ def message_post_save(sender, instance, signal, *args, **kwargs):
     if email_data:
         for item in email_data:
             message = message + ' ' + json.dumps(item)
-        instance.message = message
-        instance.save()
     send_message(instance.pk)
 
 
