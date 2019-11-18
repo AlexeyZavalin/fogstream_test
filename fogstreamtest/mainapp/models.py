@@ -1,20 +1,7 @@
 from django.db import models
-from django.db.models import signals
 import urllib.request
-import json
 
-
-def find_email(email):
-    """
-    Функция для поиска email в списке
-    :param email:
-    :return: Словарь с информацией о пользователе
-    """
-    users_json = urllib.request.urlopen('http://jsonplaceholder.typicode.com/users')
-    users = json.load(users_json)
-    for user in users:
-        if user['email'] == email:
-            yield user
+from mainapp.tasks import send_message
 
 
 class Message(models.Model):
@@ -30,21 +17,15 @@ class Message(models.Model):
     def __str__(self):
         return f'{self.email} - {self.status}'
 
+    def save(self, *args, **kwargs):
+        create_task = False
+        if self.pk is None:
+            create_task = True
+        super().save(*args, **kwargs)
+        if create_task:
+            send_message(self)
+
+
     class Meta:
         verbose_name = 'Сообщение'
         verbose_name_plural = 'Сообщения'
-
-
-from mainapp.tasks import send_message
-
-def message_post_save(sender, instance, signal, *args, **kwargs):
-    email = instance.email
-    message = instance.message
-    email_data = find_email(email)
-    if email_data:
-        for item in email_data:
-            message = message + ' ' + json.dumps(item)
-    send_message(instance.pk)
-
-
-signals.post_save.connect(message_post_save, sender=Message)

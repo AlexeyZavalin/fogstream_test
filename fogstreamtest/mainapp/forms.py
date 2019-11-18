@@ -10,7 +10,7 @@ class UserRegisterForm(UserCreationForm):
         fields = ('username', 'email', 'password1', 'password2')
 
 
-class ShopUserLoginForm(AuthenticationForm):
+class UserLoginForm(AuthenticationForm):
     class Meta:
         model = User
         fields = ('username', 'password')

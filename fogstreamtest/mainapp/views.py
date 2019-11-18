@@ -55,12 +55,13 @@ class UserCreateView(AjaxableResponseMixin, CreateView):
 class UserSignIn(AjaxableResponseMixin, FormView):
     form_class = AuthenticationForm
     template_name = 'mainapp/login.html'
+    success_url = reverse_lazy('mainapp:send_message')
 
     def form_valid(self, form):
         user = authenticate(**form.cleaned_data)
         if user:
             login(self.request, user)
-        return HttpResponseRedirect('/')
+        return HttpResponseRedirect(reverse_lazy('mainapp:send_message'))
 
 
 def index(request):
