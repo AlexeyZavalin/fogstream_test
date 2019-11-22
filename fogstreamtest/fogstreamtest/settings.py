@@ -123,7 +123,7 @@ LOGIN_URL = '/login'
 
 DOMAIN_NAME = 'http://localhost:8000'
 
-with open('smtp.yml', 'r') as smtp:
+with open(os.path.join(BASE_DIR, 'smtp.yml'), 'r') as smtp:
     smtp_settings = yaml.load(smtp, Loader=yaml.Loader)
 
 EMAIL_HOST = smtp_settings['host']
@@ -134,8 +134,8 @@ EMAIL_USE_SSL = True
 
 
 # celery
-CELERY_BROKER_URL = 'redis://localhost:6379'  
-CELERY_RESULT_BACKEND = 'redis://localhost:6379'  
-CELERY_ACCEPT_CONTENT = ['application/json']  
-CELERY_RESULT_SERIALIZER = 'json'  
+CELERY_BROKER_URL = 'redis://localhost:6379'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379'
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TASK_SERIALIZER = 'json'
