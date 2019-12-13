@@ -4,3 +4,6 @@
 *.pyc
 venv
 .idea
+.vscode
+db.sqlite3
+smtp.yml

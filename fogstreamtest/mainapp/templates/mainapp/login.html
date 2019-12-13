@@ -1,0 +1,15 @@
+{% extends 'mainapp/base.html' %}
+{% load static %}
+{% block title %}
+Вход
+{% endblock %}
+{% block content %}
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value="Войти">
+</form>
+<a href="{% url 'mainapp:register_user' %}">
+    Зарегистрироваться
+</a>
+{% endblock %}

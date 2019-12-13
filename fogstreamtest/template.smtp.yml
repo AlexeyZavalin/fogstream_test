@@ -1,0 +1,4 @@
+host: 'email-host',
+port: 465,
+email: 'user-email',
+password: 'email-password'
